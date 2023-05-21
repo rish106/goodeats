@@ -1,7 +1,11 @@
+import os
 from recombee_api_client.api_client import RecombeeClient
 from recombee_api_client.api_requests import *
+from dotenv import load_dotenv
 
-client = RecombeeClient('goodeats-dev', 'pmyeJZzC6JqbAjDZuGWp15UVH1TkcQQMiguiE7xVj1WLEByom3SQJMY79ySiMf6Z')
+load_dotenv()
+RECOMBEE_API_KEY = os.getenv('RECOMBEE_API_KEY')
+client = RecombeeClient('goodeats-dev', RECOMBEE_API_KEY)
 
 def recipe_user(user_id):
     recommeded_recipes = (client.send(RecommendItemsToUser(str(user_id), 20)))['recomms']
