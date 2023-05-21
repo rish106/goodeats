@@ -1,11 +1,11 @@
 'use client'
 
-import LargeHeading from '@/ui/LargeHeading';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { RecipeCard } from '@/components/RecipeCard';
-import { Pagination } from '@mui/material';
 import Link from 'next/link';
+import { Pagination } from '@mui/material';
+import { RecipeCard } from '@/components/RecipeCard';
+import LargeHeading from '@/ui/LargeHeading';
 import Icons from '@/components/Icons';
 import { Button } from '@/ui/Button';
 
@@ -94,6 +94,7 @@ export default function Page() {
               <div className='relative w-full'>
                 <input
                   type='text'
+                  id='search'
                   className='block h-[40px] w-full pl-10 pr-3 py-2 border rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-orange-300 focus:ring focus:ring-orange-200 focus:ring-opacity-50 sm:text-sm'
                   placeholder='Search recipes'
                   value={search}

@@ -1,10 +1,9 @@
 'use client'
 
 import LargeHeading from '@/ui/LargeHeading';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 import { RecipeCard } from '@/components/RecipeCard';
-import { Pagination } from '@mui/material';
 import Link from 'next/link';
 
 import * as jose from 'jose';
@@ -27,69 +26,81 @@ export default function Page({params}:PageProps) {
   let user_id = 0;
   let username = '';
   if (token) {
-    user_id = jose.decodeJwt(token as string).user_id as number;
-    username = jose.decodeJwt(token as string).user as string;
+    try {
+      const payload = jose.decodeJwt(token as string);
+      user_id = payload.user_id as number;
+      username = payload.user as string;
+    } catch (err) {
+      user_id = 0;
+      username = '';
+    }
   }
 
   const { data, error } = useSWR(`/api/${username}/collections/${params.id}`, fetcher);
   const [feedRecipes, setFeedRecipes] = useState<any[]>([]);
 
-  useEffect(() => {
-
-    async function getCollectionRecipes()
-    {
-      if (feedRecipes != data) {
-        setFeedRecipes(data);
-      }
-    }
-    getCollectionRecipes();
-  }, [data])
-
-  if (error) return (
-    <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
-      <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
-        <LargeHeading>
-          Error loading recipes in collection
-        </LargeHeading>
+  if (!token) {
+    return (
+      <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
+        <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
+          <LargeHeading>
+            Please log in to view your collections
+          </LargeHeading>
+        </div>
       </div>
-    </div>
-  )
-  if (!data) return (
-    <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
-      <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
-        <LargeHeading>
-          Loading recipes...
-        </LargeHeading>
-      </div>
-    </div>
-  )
+    )
+  }
 
-  if(data != feedRecipes)
-  {
+  if (error) {
+    return (
+      <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
+        <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
+          <LargeHeading>
+            Error fetching recipes
+          </LargeHeading>
+        </div>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
+        <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
+          <LargeHeading>
+            Loading recipes...
+          </LargeHeading>
+        </div>
+      </div>
+    )
+  }
+
+  if (data !== feedRecipes) {
     setFeedRecipes(data);
   }
-  if(!feedRecipes)
-  {
+
+  if (!feedRecipes) {
     return (
-        <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
-          <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
-            <LargeHeading>
-              Loading...
-            </LargeHeading>
-          </div>
+      <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
+        <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
+          <LargeHeading>
+            Loading...
+          </LargeHeading>
         </div>
-      )
+      </div>
+    )
   }
 
-  if(feedRecipes.length == 0)
-  {
-    <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
-    <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
-      <LargeHeading>
-        No recipes in this collection
-      </LargeHeading>
-    </div>
-   </div>
+  if (feedRecipes.length === 0) {
+    return (
+      <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
+        <div className='container pt-32 max-w-7xl mx-auto w-full h-full'>
+          <LargeHeading>
+            No recipes in this collection
+          </LargeHeading>
+        </div>
+      </div>
+    )
   }
 
   return (

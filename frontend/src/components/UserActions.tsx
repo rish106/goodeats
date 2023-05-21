@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import * as jose from 'jose';
+import jwt, { Secret } from 'jsonwebtoken';
 import { toast } from '@/ui/toast'
 import { useRouter } from 'next/navigation'
 import { buttonVariants } from '@/ui/Button'
@@ -16,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/ui/DropdownMenu'
 
-const UserActions = ({ secret } : { secret: string }) => {
+const UserActions = () => {
   const [session, setSession] = React.useState(false);
   const [username, setUsername] = React.useState('');
   const [dropdownOpen, setDropdownOpen] = React.useState(false)
@@ -28,17 +29,39 @@ const UserActions = ({ secret } : { secret: string }) => {
       // Check if there's a JWT token in localStorage
       const token = localStorage.getItem('token');
       if (token) {
-        const secretKey = new TextEncoder().encode(secret);
+        const secret = process.env.NEXT_PUBLIC_JWT_SECRET as string;
         try {
-          const { payload, protectedHeader } = await jose.jwtVerify(token, secretKey)
-          if (payload) {
+          jwt.verify(token, secret as Secret);
+          const payload = jose.decodeJwt(token);
+          if (payload && Date.now() < payload.exp! * 1000) {
             const user = payload.user as string;
             setUsername(user);
             setSession(true);
+          } else if (payload && Date.now() > payload.exp! * 1000) {
+            toast({
+              title: 'Session expired',
+              message: 'Please login again.',
+              type: 'error',
+              duration: 2000,
+            });
+            localStorage.removeItem('token');
+            setSession(false);
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
           }
         } catch (err) {
+          toast({
+            title: 'Error',
+            message: 'Invalid token. Please login again.',
+            type: 'error',
+            duration: 2000,
+          });
           localStorage.removeItem('token');
           setSession(false);
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
         }
       } else {
         setSession(false);
@@ -47,7 +70,7 @@ const UserActions = ({ secret } : { secret: string }) => {
     fetchToken();
     const intervalId = setInterval(fetchToken, 1000);
     return () => clearInterval(intervalId);
-  }, [secret]);
+  });
 
   const signOut = () => {
     toast({

@@ -1,4 +1,4 @@
-import * as jose from 'jose';
+import * as jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -12,16 +12,12 @@ export async function POST(request: NextRequest) {
   });
   const json = await response.json();
   if (!json.message) {
-    return NextResponse.json(json);
+    return NextResponse.json({ message: json.email || json.username || (json.password && `Password ${json.password}`) || (json.confirm_password && `Confirm Password ${json.confirm_password}`) || "" });
   }
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-  const newJson = {
+  const payload = {
     user: data.username,
     user_id: json.user_id
   };
-  const token = await new jose.SignJWT(newJson)
-    .setExpirationTime('14d')
-    .setProtectedHeader({ alg: 'HS256' })
-    .sign(secret);
+  const token = jwt.sign(payload, process.env.NEXT_PUBLIC_JWT_SECRET as string, { algorithm: 'HS256', expiresIn: '14d' });
   return NextResponse.json({ token });
 }

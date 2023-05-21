@@ -1,33 +1,32 @@
 'use client'
 
 import * as Form from '@radix-ui/react-form';
-import { Button } from '@/ui/Button';
 import * as React from 'react';
+import { Button } from '@/ui/Button';
 import { toast } from '@/ui/toast';
 import { useRouter } from 'next/navigation';
 
 const SignupForm = () => {
+  const secret = process.env.NEXT_PUBLIC_JWT_SECRET as string;
   const router = useRouter();
   const [imageSrc, setImageSrc] = React.useState<string>('');
   let token = '' as string | null;
   if (typeof window !== 'undefined') {
     token = localStorage.getItem('token');
   }
-    if (token) {
-      toast({
-        title: 'Already logged in',
-        message: '',
-        type: 'success',
-        duration: 2000,
-      });
-      setTimeout(() => {
-        router.push('/');
-      }, 1500);
-    }
+  if (token) {
+    toast({
+      title: 'Already logged in',
+      message: '',
+      type: 'success',
+      duration: 2000,
+    });
+    setTimeout(() => {
+      router.push('/');
+    }, 500);
+  }
 
   async function handleImageChange (event: any) {
-    event.preventDefault();
-
     const form = event.currentTarget;
     let fileInput = null as any;
 
@@ -45,6 +44,12 @@ const SignupForm = () => {
     }
 
     formData.append('upload_preset', 'goodeats');
+    toast({
+      title: 'Uploading image',
+      message: 'Please wait...',
+      type: 'default',
+      duration: 2000,
+    });
 
     const data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
       method: 'POST',
@@ -52,6 +57,13 @@ const SignupForm = () => {
     }).then(r => r.json());
 
     setImageSrc(data.secure_url);
+
+    toast({
+      title: 'Success',
+      message: 'Image uploaded',
+      type: 'success',
+      duration: 1500,
+    });
   }
 
   async function submitForm(data) {
@@ -67,12 +79,10 @@ const SignupForm = () => {
       body: JSON.stringify(data),
     });
     const json = await response.json();
-    if (json.username || json.email || json.password || json.confirm_password) {
-      let error_msg = "";
-      error_msg = json.email || json.username || (json.password && `Password ${json.password}`) || (json.confirm_password && `Confirm Password ${json.confirm_password}`) || "";
+    if (json.message) {
       toast({
         title: 'Error',
-        message: error_msg,
+        message: json.message,
         type: 'error',
         duration: 2000,
       });
@@ -81,10 +91,9 @@ const SignupForm = () => {
         title: 'Successfully registered',
         message: '',
         type: 'success',
-        duration: 1000,
-      })
-      const token = json.token;
-      localStorage.setItem('token', token);
+        duration: 1500,
+      });
+      localStorage.setItem('token', json.token);
       setTimeout(() => {
         router.push('/');
       }, 1500);
@@ -180,7 +189,7 @@ const SignupForm = () => {
         <p className='text-black text-start font-medium text-[15px] leading-[35px]'>
           Upload Image
         </p>
-        <input type='file' accept='image/\*' name='file'/>
+        <input type='file' accept='image/*' name='file'/>
       </form>
       <Form.Submit asChild>
         <Button className='w-full'>

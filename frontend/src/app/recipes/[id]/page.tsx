@@ -4,13 +4,13 @@ import Image from 'next/image';
 import useSWR from 'swr';
 import React from 'react';
 import * as jose from 'jose';
+import Link from 'next/link';
 import LargeHeading from '@/ui/LargeHeading';
 import Paragraph from '@/ui/Paragraph';
 import Icons from '@/components/Icons';
 import CommentForm from '@/components/CommentForm';
 import { RecipeActions } from '@/components/RecipeActions';
 import { CommentCard } from '@/components/CommentCard';
-import Link from 'next/link';
 
 interface ingredient {
   amount: string;
@@ -33,18 +33,22 @@ const commentFetcher = async (url: string) => {
   if (token) {
     user_id = jose.decodeJwt(token as string).user_id as number;
   }
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(user_id ? { user_id } : {}),
-  })
-  const data = await res.json();
-  if (data.error) {
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user_id ? { user_id } : {}),
+    })
+    const data = await res.json();
+    if (data.error) {
+      return {user_reviews: [], other_reviews: []};
+    } else {
+      return data;
+    }
+  } catch (err) {
     return {user_reviews: [], other_reviews: []};
-  } else {
-    return data;
   }
 }
 
@@ -82,7 +86,7 @@ const Page = ({ params }: PageProps) => {
     <div className='relative h-screen flex items-center justify-center overflow-x-hidden'>
       <div className='container max-w-full mx-auto w-full h-full'>
         <div className='h-full gap-0 flex flex-col justify-start items-center'>
-          <div className='flex pt-32 flex-col-reverse justify-between items-center gap-8 md:flex-row md:px-10 bg-slate-800 min-h-screen w-full px-8 pb-8'>
+          <div className='flex pt-32 flex-col-reverse justify-between items-center gap-8 md:flex-row md:px-10 bg-slate-800 w-full px-8 pb-8'>
             <div className='flex flex-col md:w-1/2 justify-center gap-3 items-center'>
               <LargeHeading className='text-white text-center w-full'>
                 {post.recipe_data.name}
@@ -116,7 +120,7 @@ const Page = ({ params }: PageProps) => {
               width={500}
               height={500} />
           </div>
-          <div className='flex flex-col justify-center gap-6 md:gap-32 md:flex-row bg-slate-100 w-full pt-8 pb-8'>
+          <div className='flex flex-col justify-center gap-6 md:flex-row bg-slate-100 w-full px-8 py-8'>
             <div className='flex flex-col justify-start items-center gap-1'>
               <LargeHeading size='xs'>
                 Ingredients
@@ -158,7 +162,7 @@ const Page = ({ params }: PageProps) => {
                 <div className='flex flex-col items-center justify-start w-full gap-4 pt-4'>
                   {
                     comments.map((comment: any) =>
-                      <CommentCard key={comment.review_id} reviewId={comment.review_id} author={comment.username} message={comment.reviewText} rating={comment.rating} />
+                      <CommentCard key={comment.review_id} reviewId={comment.review_id} author={comment.username} message={comment.reviewText} rating={comment.rating} likes={comment.reviewLikes} />
                     )
                   }
                 </div>

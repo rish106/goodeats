@@ -49,22 +49,31 @@ const CommentForm : React.FC<CommentProps> = ({id}: CommentProps) => {
     // assign user_id
     data.user_id = jose.decodeJwt(token).user_id;
 
-    const response = await fetch(route_link, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (response.ok) {
+    try {
+      const response = await fetch(route_link, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        toast({
+          title: 'Success',
+          message: 'Your review has been added',
+          type: 'success',
+          duration: 2000,
+        });
+        setRating(0);
+        setReviewText('');
+      }
+    } catch (err) {
       toast({
-        title: 'Success',
-        message: 'Your review has been added',
-        type: 'success',
+        title: 'Error',
+        message: 'Something went wrong',
+        type: 'error',
         duration: 2000,
       });
-      setRating(0);
-      setReviewText('');
     }
   };
 
@@ -110,7 +119,7 @@ const CommentForm : React.FC<CommentProps> = ({id}: CommentProps) => {
               <textarea
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
-              className='pt-2 box-border w-full bg-blackA5 shadow-white inline-flex h-[60px] md:h-[35px] appearance-none items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none text-white shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px] focus:shadow-[0_0_0_2px_white] selection:color-white' />
+              className='box-border w-full bg-blackA5 shadow-white inline-flex h-[60px] md:h-[35px] appearance-none items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-6 text-white shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px] focus:shadow-[0_0_0_2px_white] selection:color-white' />
             </Form.Control>
           </Form.Field>
         </div>

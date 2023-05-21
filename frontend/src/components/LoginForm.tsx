@@ -7,12 +7,25 @@ import { toast } from '@/ui/toast';
 
 
 const LoginForm = () => {
-
   const router = useRouter();
+  const token = (typeof window !== 'undefined') ? localStorage.getItem('token') : null;
+  if (token) {
+    toast({
+      title: 'Already logged in',
+      message: '',
+      type: 'success',
+      duration: 2000,
+    });
+    setTimeout(() => {
+      router.push('/');
+    }, 500);
+  }
 
   async function submitForm(data) {
+    let expiresIn = '1h';
     if (data.remember == 'on') {
       data.remember = true;
+      expiresIn = '14d';
     } else {
       data.remember = false;
     }
@@ -31,14 +44,12 @@ const LoginForm = () => {
         type: 'success',
         duration: 1500,
       })
-      const token = json.token;
-      localStorage.setItem('token', token);
+      localStorage.setItem('token', json.token);
       setTimeout(() => {
         router.push('/');
       }, 1000);
-    }
-    else {
-      const error_msg = json.message || json.password || json.username;
+    } else {
+      const error_msg = json.message;
       toast({
         title: 'Error',
         message: error_msg,

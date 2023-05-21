@@ -1,9 +1,9 @@
-import * as jose from 'jose';
+import * as jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const data = await request.json()
-  let expiresIn = '1h'
+  const data = await request.json();
+  let expiresIn = '1h';
   if (data.rememberMe) {
     expiresIn = '14d';
   }
@@ -16,16 +16,12 @@ export async function POST(request: NextRequest) {
   });
   const json = await response.json();
   if (json?.user_id) {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const newJson = {
+    const payload = {
       user: data.username,
       user_id: json.user_id
     };
-    const token = await new jose.SignJWT(newJson)
-      .setExpirationTime(expiresIn)
-      .setProtectedHeader({ alg: 'HS256' })
-      .sign(secret);
+    const token = jwt.sign(payload, process.env.NEXT_PUBLIC_JWT_SECRET as string, { algorithm: 'HS256', expiresIn: expiresIn });
     return NextResponse.json({ token });
   }
-  return NextResponse.json(json);
+  return NextResponse.json({ message: json.message || json.password || json.username });
 }

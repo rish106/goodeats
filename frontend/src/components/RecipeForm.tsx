@@ -32,6 +32,12 @@ const RecipeForm = () => {
     }
 
     formData.append('upload_preset', 'goodeats');
+    toast({
+      title: 'Uploading image',
+      message: 'Please wait...',
+      type: 'default',
+      duration: 2000,
+    });
 
     const data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
       method: 'POST',
@@ -39,6 +45,13 @@ const RecipeForm = () => {
     }).then(r => r.json());
 
     setImageSrc(data.secure_url);
+
+    toast({
+      title: 'Success',
+      message: 'Image uploaded',
+      type: 'success',
+      duration: 1500,
+    });
   }
 
   async function submitForm(data) {
@@ -75,7 +88,8 @@ const RecipeForm = () => {
     data.ingredients = ingredients;
 
     // assign user_id
-    data.user_id = parseInt(jose.decodeJwt(token).user_id as string);
+    const payload = jose.decodeJwt(token);
+    data.user_id = parseInt(payload.user_id as string);
 
     // parse keywords
     data.keywords = data.keywords.split(',').map((keyword: string) => keyword.trim());
@@ -228,23 +242,23 @@ const RecipeForm = () => {
         </div>
         <Form.Control asChild>
           <textarea
-            className='pt-1 box-border w-full bg-blackA5 shadow-blackA9 inline-flex h-[100px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-none text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black]'
+            className='box-border w-full bg-blackA5 shadow-blackA9 inline-flex h-[100px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-6 text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black]'
             required
           />
         </Form.Control>
       </Form.Field>
       <Form.Field className='grid mb-[6px] md:mb-[10px]' name='ingredients'>
-        <div className='flex items-baseline justify-between'>
-          <Form.Label className='text-black font-medium text-[15px] leading-[35px]'>
-            Ingredients
+        <div className='flex items-baseline justify-between gap-1'>
+          <Form.Label className='flex flex-col md:flex-row md:gap-2 text-black font-medium text-[15px] md:leading-[35px]'>
+            Ingredients <p className='text-[12px] text-slate-500'> (&quot;quantity &lt;space&gt; name&quot; on each line)</p>
           </Form.Label>
-          <Form.Message className='text-black text-[13px] opacity-80' match='valueMissing'>
+          <Form.Message className='min-w-[150px] text-black text-[13px] opacity-80' match='valueMissing'>
             Please enter ingredients
           </Form.Message>
         </div>
         <Form.Control asChild>
           <textarea
-            className='pt-1 box-border w-full bg-blackA5 shadow-blackA9 inline-flex h-[100px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-none text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black]'
+            className='box-border w-full bg-blackA5 shadow-blackA9 inline-flex h-[100px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-6 text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black]'
             required
           />
         </Form.Control>
@@ -260,7 +274,7 @@ const RecipeForm = () => {
         </div>
         <Form.Control asChild>
           <textarea
-            className='pt-1 box-border w-full bg-blackA5 shadow-blackA9 inline-flex h-[100px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-none text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black]'
+            className='box-border w-full bg-blackA5 shadow-blackA9 inline-flex h-[100px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-6 text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black]'
             required
           />
         </Form.Control>
@@ -269,7 +283,7 @@ const RecipeForm = () => {
         <p className='text-black font-medium text-[15px] leading-[35px]'>
           Upload Image
         </p>
-        <input type='file' accept='image/\*' name='file'/>
+        <input type='file' accept='image/*' name='file'/>
       </form>
       <div className='flex flex-row w-full justify-center md:justify-end'>
         <Form.Submit asChild>
