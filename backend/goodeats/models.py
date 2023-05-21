@@ -1,6 +1,5 @@
 from datetime import datetime
 from goodeats.database import db
-# from flask_login import UserMixin
 import random
 
 follower_table = db.Table('follower_table',
@@ -21,11 +20,9 @@ class User(db.Model):
     # Relationships
     followers = db.relationship('User', secondary=follower_table,  primaryjoin=(follower_table.c.follower_id == id), 
                                 secondaryjoin=(follower_table.c.following_id == id),
-                                # backref=db.backref('following', lazy='dynamic'), 
                                 lazy='dynamic')
     following = db.relationship('User', secondary=follower_table,  primaryjoin=(follower_table.c.following_id == id), 
                                 secondaryjoin=(follower_table.c.follower_id == id),
-                                # backref=db.backref('follower', lazy='dynamic'), 
                                 lazy='dynamic')
     recipes = db.relationship('Recipe', backref='author', lazy=True)
     reviews = db.relationship('Reviews', backref='author', lazy=True)

@@ -1,5 +1,4 @@
 from flask import request, jsonify
-# from flask_login import login_user, current_user, logout_user, login_required 
 from goodeats import app, db, bcrypt
 from goodeats.forms import RegistrationForm, LoginForm, UpdateProfileForm, RecipeForm,  IngredientForm
 from goodeats.models import User, Keywords, Ingredients, Recipe, Collections, Reviews
@@ -140,7 +139,6 @@ def profile(username):
     return jsonify(user.to_dict()), 200
 
 @app.route("/<username>/update", methods=['GET', 'POST'])
-# @login_required
 def update_profile(username):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -165,7 +163,6 @@ def update_profile(username):
         return jsonify({"message":"Bad Request"}), 400
 
 @app.route("/<username>/delete", methods=['POST'])
-# @login_required
 def deleteUser(username):
     data = request.get_json()
     user_id = data.get('user_id')
@@ -179,7 +176,6 @@ def deleteUser(username):
     return jsonify({'message': 'User deleted successfully.'}), 200
 
 @app.route("/recipe/post", methods=['POST'])
-# @login_required
 def new_recipe():
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -246,7 +242,6 @@ def recipe_loggedin(recipe_id):
     return jsonify({'recipe_data': recipe.to_dict(), 'user_data': user.to_dict()}), 200
 
 @app.route("/recipe/<int:recipe_id>/update", methods=['GET', 'POST'])
-# @login_required
 def update_recipe(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -316,7 +311,6 @@ def update_recipe(recipe_id):
         return jsonify({'message': 'HTTP Bad Request'}), 400
 
 @app.route("/recipe/<int:recipe_id>/delete", methods=['POST'])
-# @login_required
 def delete_recipe(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -418,7 +412,6 @@ def get_reviews(recipe_id):
                     'other_reviews':[review.to_dict() for review in other_reviews]}), 200
 
 @app.route("/recipe/<int:recipe_id>/reviews/new", methods=['POST'])
-# @login_required
 def add_review(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -434,7 +427,6 @@ def add_review(recipe_id):
     return jsonify(review.to_dict()), 200
 
 @app.route("/recipe/<int:recipe_id>/reviews/like", methods=['POST'])
-# @login_required
 def change_review_like(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -452,7 +444,6 @@ def change_review_like(recipe_id):
     return jsonify({'message': 'Success'}), 200
 
 @app.route("/recipe/<int:recipe_id>/reviews/delete", methods=['POST'])
-# @login_required
 def delete_review(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -505,9 +496,7 @@ def collection_recipes(username, collection_id):
         recipe_list.append(recipe.to_dict())
     return jsonify(recipe_list), 200
 
-#for adding
 @app.route("/recipe/collection/<int:recipe_id>/", methods=['POST'])
-# @login_required
 def addtoCollection(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -523,7 +512,6 @@ def addtoCollection(recipe_id):
     return jsonify({'message': 'Successfully added recipe!'}), 200
 
 @app.route("/<username>/collections/<int:collection_id>/delete", methods=['POST'])
-# @login_required
 def delete_collection(username, collection_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -538,7 +526,6 @@ def delete_collection(username, collection_id):
     return jsonify({'message': 'Collection deleted successfully.'}), 200
 
 @app.route("/<username>/following", methods=['GET', 'POST'])
-# @login_required
 def get_following(username):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -564,7 +551,6 @@ def get_following(username):
         return jsonify({'message': 'HTTP Bad Request'}), 400
 
 @app.route("/recipe/<int:recipe_id>/follow", methods=['POST'])
-# @login_required
 def change_following(recipe_id):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))
@@ -584,7 +570,6 @@ def change_following(recipe_id):
         return jsonify({'message': f"You are now following {author.username}"}), 200
     
 @app.route('/<username>/follow', methods=['POST'])
-# @login_required
 def follow_user(username):
     data = request.get_json()
     current_user = User.query.get_or_404(data.get('user_id'))

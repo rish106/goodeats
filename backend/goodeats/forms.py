@@ -1,6 +1,4 @@
 from flask_wtf import FlaskForm
-# from flask_wtf.file import FileField, FileAllowed # For image files
-# from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, FieldList, EmailField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from goodeats.models import User
