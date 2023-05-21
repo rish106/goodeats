@@ -1,3 +1,5 @@
+# python cache
 *.pyc
-.next/
-.env
+
+# mac moment
+.DS_Store
