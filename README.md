@@ -49,7 +49,7 @@ RECOMBEE_API_KEY='my_recombee_api_key'
 ```
 pip install -r backend/requirements.txt
 ```
-- Start the flask server using
+- Start the Flask API using
 ```
 python3 backend/run.py
 ```
