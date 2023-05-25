@@ -15,6 +15,12 @@ Frontend development was done at https://github.com/rish106/goodeats-frontend
 ## Initial Plan
 The API description [API Doc.yml](https://github.com/rish106/goodeats/blob/main/API_Doc.yml) was created using swagger and [ER diagram](https://github.com/rish106/goodeats/blob/main/ER_diagram.pdf) was made for the database design. A [Figma prototype](https://github.com/rish106/goodeats/blob/main/goodeats.fig) was made for the design of the web app. [Prototype demo](https://youtu.be/Rl7SulABLos)
 
+## Website Demo
+
+[Video 1](https://www.youtube.com/watch?v=LeP4TBvHTLM)
+
+[Video 2](https://www.youtube.com/watch?v=sp-evLx-WgI)
+
 ## Languages/Frameworks used
 - Next.js 13
 - Tailwind CSS
